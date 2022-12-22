@@ -14,6 +14,48 @@ class Product:
         return f"{self.id} - {self.name} - {self.description} - ${str(self.price)}"
 
 '''
+'''
+class ProductsRepository:
+    def create(self,product:Product) -> int:
+        """Inserts product instance into db
+
+        Args:
+            product (Product): Product instance
+
+        Returns:
+            int: Created products
+        """
+        row = parse_row_product(product)
+        return execute_db(f"INSERT INTO products {row}")
+        
+    def read(self) -> List[Product]:
+        """Reads products from db
+
+        Returns:
+            List[Product]: Products list
+        """
+        products:List[Product] = []
+        rows = query_db("SELECT * FROM products")
+        for row in rows:
+            products.append(parse_product_row(row))
+        return products
+
+    def update(self, id:int, product:Product) -> int:
+        """Updates product from database
+
+        Args:
+            id (int): Id of the product to be updated
+            product (Product): Product instance
+
+        Returns:
+            int: Updated rows. Should be 1
+        """
+        row = parse_row_product(product)
+        return execute_db(f"UPDATE products {row} WHERE id = {id}")
+
+    def delete(self,id:int):
+        execute_db(f"DELETE FROM products WHERE id = {id}")
+'''
 DB
 '''
 def connect_db() -> pymysql.Connection:
@@ -91,48 +133,7 @@ def parse_product_row(row:dict) -> Product:
     product.description = row["description"]
     return product
 
-'''
-CRUD
-'''
-def create_product(product:Product) -> int:
-    """Inserts product instance into db
 
-    Args:
-        product (Product): Product instance
-
-    Returns:
-        int: Created products
-    """
-    row = parse_row_product(product)
-    return execute_db(f"INSERT INTO products {row}")
-    
-def read_products() -> List[Product]:
-    """Reads products from db
-
-    Returns:
-        List[Product]: Products list
-    """
-    products:List[Product] = []
-    rows = query_db("SELECT * FROM products")
-    for row in rows:
-        products.append(parse_product_row(row))
-    return products
-
-def update_product(id:int, product:Product) -> int:
-    """Updates product from database
-
-    Args:
-        id (int): Id of the product to be updated
-        product (Product): Product instance
-
-    Returns:
-        int: Updated rows. Should be 1
-    """
-    row = parse_row_product(product)
-    return execute_db(f"UPDATE products {row} WHERE id = {id}")
-
-def delete_product(id:int):
-    execute_db(f"DELETE FROM products WHERE id = {id}")
 
 
 ''' Command line interface '''
@@ -154,6 +155,7 @@ def clear():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 option:int = -1
+products_repository = ProductsRepository()
 while option != 0:
     try:
         clear()
@@ -166,13 +168,12 @@ while option != 0:
 
         option = int(input("Choose an option: "))
         if option == 1:
-            print("Creating products")
             product = prompt_product()
-            create_product(product)
+            products_repository.create(product)
 
         elif option == 2:
-            print("Reading products")
-            products = read_products()
+            print("Creating product")
+            products = products_repository.read()
             for product in products:
                 print(str(product))
 
@@ -180,15 +181,17 @@ while option != 0:
             print("Editing product")
             id = int(input("Id:"))
             product = prompt_product()
-            update_product(id, product)
+            products_repository.update(id, product)
 
         elif option == 4:
             print("Deleting product")
             id = int(input("Id:"))
-            delete_product(id)
+            products_repository.delete(id)
         
         if option != 0:
             input("Press any key to go back...")
-    except:
-        input("Error. Press Enter to continue...")
+    except Exception as e:
+        print("ERROR!\n")
+        print(str(e))
+        input("\nPress Enter to continue...")
         pass
