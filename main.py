@@ -166,11 +166,12 @@ while option != 0:
 
         option = int(input("Choose an option: "))
         if option == 1:
+            print("Creating products")
             product = prompt_product()
             create_product(product)
 
         elif option == 2:
-            print("Creating product")
+            print("Reading products")
             products = read_products()
             for product in products:
                 print(str(product))
