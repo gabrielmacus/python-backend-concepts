@@ -27,14 +27,15 @@ while option != 0:
 
         option = int(input("Choose an option: "))
         if option == 1:
+            print("Creating product")
             product = cli_services.prompt_product()
             products_repository.create(product)
 
         elif option == 2:
-            print("Creating product")
-            products = products_repository.read()
+            print("Reading products")
+            products:List[Product] = products_repository.read()
             for product in products:
-                print(str(product))
+                print(vars(product))
 
         elif option == 3:
             print("Editing product")

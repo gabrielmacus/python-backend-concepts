@@ -1,33 +1,21 @@
+from ..base.services import BaseServices
 from .model import Product
 
-class ProductServices:
-    def parse_row(self,product:Product) -> str:
-        """Generates SQL query from Product instance, using fields set in object
+class ProductServices(BaseServices):
 
-        Args:
-            product (Product): Product instance
+    def __init__(self):
+        pass
 
-        Returns:
-            str: SQL query
-        """
-        sql = "SET "
-        sql += f"name = '{product.name}',"
-        sql += f"description = '{product.description}',"
-        sql += f"price = '{product.price}'"
-        return sql
+    def item_to_row(self,item:Product) -> dict:
+        data = BaseServices.item_to_row(self,item)
+        data['name'] = f"'{item.name}'"
+        data['description'] = f"'{item.description}'"
+        data['price'] = f"{item.price}"
+        return data
 
-    def parse_product(self,row:dict) -> Product:
-        """Generates a Product instance from db row
-
-        Args:
-            row (dict): Db row
-
-        Returns:
-            Product: Product instance
-        """
-        product = Product()
-        product.id = row["id"]
-        product.name = row["name"]
-        product.price = row["price"]
-        product.description = row["description"]
-        return product
+    def row_to_item(self,row:dict) -> Product:
+        item:Product = BaseServices.row_to_item(self,row)
+        item.name = row['name']
+        item.description = row['description']
+        item.price = row['price']
+        return item
