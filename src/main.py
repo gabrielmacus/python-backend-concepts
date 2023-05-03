@@ -16,7 +16,6 @@ products_repository = ProductsRepository(db_services, products_services)
 
 
 while option != 0:
-    try:
         cli_services.clear()
         print("Select an option:")
         print("1 - Create product")
@@ -50,8 +49,3 @@ while option != 0:
         
         if option != 0:
             input("Press any key to go back...")
-    except Exception as e:
-        print("ERROR!\n")
-        print(str(e))
-        input("\nPress Enter to continue...")
-        pass
